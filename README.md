@@ -1,6 +1,6 @@
 # Train Reservation API
 
-Minimal bir .NET 9 API; verilen tren ve vagon bilgilerine göre rezervasyonun kurallara uyup uymadığını hesaplar ve hangi vagona kaç kişinin yerleşeceğini döner. Girdi/çıktı şeması tamamen Türkçe tutuldu.
+Minimal bir .NET 9 API; verilen tren ve vagon bilgilerine göre rezervasyonun kurallara uyup uymadığını hesaplar ve hangi vagona kaç kişinin yerleşeceğini döner.
 
 ## Çalıştırma
 - .NET 9 SDK yüklü olmalı.
@@ -8,7 +8,7 @@ Minimal bir .NET 9 API; verilen tren ve vagon bilgilerine göre rezervasyonun ku
   ```bash
   dotnet run --project src/TrainReservation.Api
   ```
-  Varsayılan adres: `http://localhost:5078` (launchSettings varsa değişebilir).
+  Varsayılan adres: `http://localhost:5078`.
 - Testler: `dotnet test --no-build`
 - Docker:
   ```bash
