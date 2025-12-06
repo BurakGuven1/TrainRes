@@ -20,74 +20,74 @@ public class ReservationService : IReservationService
             return new ReservationResponse(false, Array.Empty<Placement>());
         }
 
-        var wagons = request.Tren.Vagonlar
-            .Select(wagon => new WagonWithAvailability(wagon, CalculateAvailableSeats(wagon)))
-            .Where(wagon => wagon.AvailableSeats > 0)
+        var vagons = request.Tren.Vagonlar
+            .Select(vagon => new vagonWithAvailability(vagon, CalculateAvailableSeats(vagon)))
+            .Where(vagon => vagon.AvailableSeats > 0)
             .ToList();
 
-        if (wagons.Count == 0)
+        if (vagons.Count == 0)
         {
             return new ReservationResponse(false, Array.Empty<Placement>());
         }
 
         if (!request.KisilerFarkliVagonlaraYerlestirilebilir)
         {
-            var singleWagon = wagons
-                .Where(wagon => wagon.AvailableSeats >= request.RezervasyonYapilacakKisiSayisi)
-                .OrderBy(wagon => wagon.AvailableSeats)
+            var singlevagon = vagons
+                .Where(vagon => vagon.AvailableSeats >= request.RezervasyonYapilacakKisiSayisi)
+                .OrderBy(vagon => vagon.AvailableSeats)
                 .FirstOrDefault();
 
-            if (singleWagon is null)
+            if (singlevagon is null)
             {
                 return new ReservationResponse(false, Array.Empty<Placement>());
             }
 
-            var placement = new Placement(singleWagon.Wagon.Ad, request.RezervasyonYapilacakKisiSayisi);
+            var placement = new Placement(singlevagon.vagon.Ad, request.RezervasyonYapilacakKisiSayisi);
             return new ReservationResponse(true, new[] { placement });
         }
 
-        var (success, placements) = AllocateAcrossWagons(request.RezervasyonYapilacakKisiSayisi, wagons);
+        var (success, placements) = AllocateAcrossvagons(request.RezervasyonYapilacakKisiSayisi, vagons);
         return new ReservationResponse(success, success ? placements : Array.Empty<Placement>());
     }
 
-    private static (bool Success, IReadOnlyCollection<Placement> Placements) AllocateAcrossWagons(
+    private static (bool Success, IReadOnlyCollection<Placement> Placements) AllocateAcrossvagons(
         int requestedSeats,
-        IEnumerable<WagonWithAvailability> wagons)
+        IEnumerable<vagonWithAvailability> vagons)
     {
         var remaining = requestedSeats;
         var placements = new List<Placement>();
 
-        foreach (var wagon in wagons)
+        foreach (var vagon in vagons)
         {
             if (remaining == 0)
             {
                 break;
             }
 
-            var seatsToUse = Math.Min(wagon.AvailableSeats, remaining);
+            var seatsToUse = Math.Min(vagon.AvailableSeats, remaining);
             if (seatsToUse <= 0)
             {
                 continue;
             }
 
-            placements.Add(new Placement(wagon.Wagon.Ad, seatsToUse));
+            placements.Add(new Placement(vagon.vagon.Ad, seatsToUse));
             remaining -= seatsToUse;
         }
 
         return (remaining == 0, placements);
     }
 
-    private static int CalculateAvailableSeats(Wagon wagon)
+    private static int CalculateAvailableSeats(Wagon vagon)
     {
-        if (wagon.Kapasite <= 0)
+        if (vagon.Kapasite <= 0)
         {
             return 0;
         }
 
-        var limit = (int)Math.Floor(wagon.Kapasite * OnlineOccupancyLimit);
-        var available = limit - wagon.DoluKoltukAdet;
+        var limit = (int)Math.Floor(vagon.Kapasite * OnlineOccupancyLimit);
+        var available = limit - vagon.DoluKoltukAdet;
         return Math.Max(0, available);
     }
 
-    private sealed record WagonWithAvailability(Wagon Wagon, int AvailableSeats);
+    private sealed record vagonWithAvailability(Wagon vagon, int AvailableSeats);
 }
