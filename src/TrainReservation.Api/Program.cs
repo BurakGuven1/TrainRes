@@ -4,6 +4,8 @@ using TrainReservation.Api.Transport;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -15,10 +17,14 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.MapOpenApi();
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Train Reservation API v1");
+    options.RoutePrefix = "swagger";
+});
+
+app.MapOpenApi();
 
 app.UseHttpsRedirection();
 
